@@ -3,7 +3,7 @@
 A dependency-free, client-side dual-channel frequency generator for binaural-beat
 experimentation. Built with the Web Audio API — no backend, no build step.
 
-**Live demo:** _(add your GitHub Pages URL here after first deploy)_
+**Live demo:** https://pharaohm33.github.io/binaural-beat-generator/
 
 ## Features
 
