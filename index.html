@@ -35,10 +35,18 @@
   <section class="channels">
     <div class="channel channel-left">
       <h2>Left Ear</h2>
-      <div class="freq-row">
-        <input type="range" id="freqLeftSlider" min="30" max="15000" step="1" value="400" />
-        <input type="number" id="freqLeftNum" min="30" max="15000" step="0.1" value="400" />
-        <span class="unit">Hz</span>
+      <input type="range" id="freqLeftSlider" class="freq-slider" min="0" max="1000" step="1" value="0" aria-label="Left ear frequency (log scale)" />
+      <div class="freq-entry">
+        <div class="freq-num-wrap">
+          <input type="number" id="freqLeftNum" class="freq-num" inputmode="decimal" min="30" max="15000" step="any" value="400" />
+          <span class="unit">Hz</span>
+        </div>
+        <div class="stepper-row">
+          <button type="button" class="stepper-btn" data-target="freqLeftNum" data-step="-10" aria-label="Decrease left frequency by 10 Hz">−10</button>
+          <button type="button" class="stepper-btn" data-target="freqLeftNum" data-step="-1" aria-label="Decrease left frequency by 1 Hz">−1</button>
+          <button type="button" class="stepper-btn" data-target="freqLeftNum" data-step="1" aria-label="Increase left frequency by 1 Hz">+1</button>
+          <button type="button" class="stepper-btn" data-target="freqLeftNum" data-step="10" aria-label="Increase left frequency by 10 Hz">+10</button>
+        </div>
       </div>
       <label class="wave-label">Waveform
         <select id="waveLeft">
@@ -52,10 +60,18 @@
 
     <div class="channel channel-right">
       <h2>Right Ear</h2>
-      <div class="freq-row">
-        <input type="range" id="freqRightSlider" min="30" max="15000" step="1" value="432" />
-        <input type="number" id="freqRightNum" min="30" max="15000" step="0.1" value="432" />
-        <span class="unit">Hz</span>
+      <input type="range" id="freqRightSlider" class="freq-slider" min="0" max="1000" step="1" value="0" aria-label="Right ear frequency (log scale)" />
+      <div class="freq-entry">
+        <div class="freq-num-wrap">
+          <input type="number" id="freqRightNum" class="freq-num" inputmode="decimal" min="30" max="15000" step="any" value="432" />
+          <span class="unit">Hz</span>
+        </div>
+        <div class="stepper-row">
+          <button type="button" class="stepper-btn" data-target="freqRightNum" data-step="-10" aria-label="Decrease right frequency by 10 Hz">−10</button>
+          <button type="button" class="stepper-btn" data-target="freqRightNum" data-step="-1" aria-label="Decrease right frequency by 1 Hz">−1</button>
+          <button type="button" class="stepper-btn" data-target="freqRightNum" data-step="1" aria-label="Increase right frequency by 1 Hz">+1</button>
+          <button type="button" class="stepper-btn" data-target="freqRightNum" data-step="10" aria-label="Increase right frequency by 10 Hz">+10</button>
+        </div>
       </div>
       <label class="wave-label">Waveform
         <select id="waveRight">

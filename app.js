@@ -84,9 +84,20 @@ let scopeRAF = null;
 
 const FREQ_MIN = 30;
 const FREQ_MAX = 15000;
+const FREQ_SLIDER_STEPS = 1000;
+const FREQ_LOG_RANGE = Math.log(FREQ_MAX / FREQ_MIN);
 
 function volumeToGain(percent) {
   return Math.pow(percent / 100, 1.7);
+}
+
+/* Frequency sliders are log-scaled (0..FREQ_SLIDER_STEPS) so the 30-500 Hz
+   region most presets live in isn't crushed into a sliver of the track. */
+function hzToSliderPos(hz) {
+  return Math.round((Math.log(hz / FREQ_MIN) / FREQ_LOG_RANGE) * FREQ_SLIDER_STEPS);
+}
+function sliderPosToHz(pos) {
+  return FREQ_MIN * Math.exp((pos / FREQ_SLIDER_STEPS) * FREQ_LOG_RANGE);
 }
 
 function ensureContext() {
@@ -260,18 +271,18 @@ function clamp(v, min, max) {
 }
 
 function syncFreqLeft(value) {
-  const v = clamp(value, FREQ_MIN, FREQ_MAX);
+  const v = round(clamp(value, FREQ_MIN, FREQ_MAX), 1);
   state.leftFreq = v;
-  el.freqLeftSlider.value = v;
+  el.freqLeftSlider.value = hzToSliderPos(v);
   el.freqLeftNum.value = v;
   applyFrequencies();
   highlightActivePreset();
 }
 
 function syncFreqRight(value) {
-  const v = clamp(value, FREQ_MIN, FREQ_MAX);
+  const v = round(clamp(value, FREQ_MIN, FREQ_MAX), 1);
   state.rightFreq = v;
-  el.freqRightSlider.value = v;
+  el.freqRightSlider.value = hzToSliderPos(v);
   el.freqRightNum.value = v;
   applyFrequencies();
   highlightActivePreset();
@@ -282,15 +293,57 @@ el.playBtn.addEventListener("click", () => {
   else start();
 });
 
-el.freqLeftSlider.addEventListener("input", (e) => syncFreqLeft(parseFloat(e.target.value)));
+el.freqLeftSlider.addEventListener("input", (e) => syncFreqLeft(sliderPosToHz(parseFloat(e.target.value))));
 el.freqLeftNum.addEventListener("input", (e) => {
   if (e.target.value === "") return;
   syncFreqLeft(parseFloat(e.target.value));
 });
-el.freqRightSlider.addEventListener("input", (e) => syncFreqRight(parseFloat(e.target.value)));
+el.freqRightSlider.addEventListener("input", (e) => syncFreqRight(sliderPosToHz(parseFloat(e.target.value))));
 el.freqRightNum.addEventListener("input", (e) => {
   if (e.target.value === "") return;
   syncFreqRight(parseFloat(e.target.value));
+});
+
+/* Select-all on focus so tapping/clicking the field lets you immediately
+   type over the value instead of having to delete it first. */
+[el.freqLeftNum, el.freqRightNum].forEach((input) => {
+  input.addEventListener("focus", () => input.select());
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") input.blur();
+  });
+});
+
+/* Stepper buttons: tap to nudge by the given step; press-and-hold repeats. */
+function stepNumberInput(input, step) {
+  const next = (parseFloat(input.value) || 0) + step;
+  if (input === el.freqLeftNum) syncFreqLeft(next);
+  else if (input === el.freqRightNum) syncFreqRight(next);
+}
+
+document.querySelectorAll(".stepper-btn").forEach((btn) => {
+  const target = $(btn.dataset.target);
+  const step = parseFloat(btn.dataset.step);
+  let holdTimeout = null;
+  let holdInterval = null;
+
+  const doStep = () => stepNumberInput(target, step);
+  const stopHold = () => {
+    clearTimeout(holdTimeout);
+    clearInterval(holdInterval);
+    holdTimeout = null;
+    holdInterval = null;
+  };
+
+  btn.addEventListener("pointerdown", (e) => {
+    e.preventDefault();
+    doStep();
+    holdTimeout = window.setTimeout(() => {
+      holdInterval = window.setInterval(doStep, 90);
+    }, 400);
+  });
+  btn.addEventListener("pointerup", stopHold);
+  btn.addEventListener("pointerleave", stopHold);
+  btn.addEventListener("pointercancel", stopHold);
 });
 
 el.waveLeft.addEventListener("change", (e) => {
