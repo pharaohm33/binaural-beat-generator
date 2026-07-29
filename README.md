@@ -16,10 +16,11 @@ experimentation. Built with the Web Audio API — no backend, no build step.
   rate you can set in **Hz, BPM, or ms period** (all three stay in sync). Depth,
   waveform shape (smooth sine, isochronic square, triangle), and a sync/antiphase
   mode (pulse together vs. alternate L/R) are all adjustable live.
-- Presets spanning the standard EEG bands (Delta/Theta/Alpha/Beta/Gamma), including
-  the two hemi-sync-style pairs this was built for:
-  - **400 Hz / 432 Hz** → 32 Hz beat (Gamma)
-  - **110 Hz / 103 Hz** → 7 Hz beat (Theta)
+- Nine presets grouped into the five EEG bands (Delta/Theta/Alpha/Beta/Gamma), each
+  section labeled with its Hz range and what it's typically used for (sleep,
+  meditation, relaxed focus, concentration, high-level cognition) — including the
+  two hemi-sync-style pairs this was built for, **400/432 Hz** (Gamma) and
+  **110/103 Hz** (Theta).
 - Live beat-frequency readout with brainwave-band classification.
 - Built-in oscilloscope (`AnalyserNode` + canvas).
 - A gentle `DynamicsCompressorNode` safety limiter on the master output.

@@ -2,13 +2,51 @@
 
 /* ---------- Presets ---------- */
 /* left/right are the tone frequencies fed to each ear; the "beat" your
-   brain perceives is |left - right|. Bands use standard EEG ranges. */
-const PRESETS = [
-  { name: "Meditative Theta", left: 110, right: 103, note: "7 Hz beat · classic hemi-sync theta pair" },
-  { name: "Focus Gamma", left: 400, right: 432, note: "32 Hz beat · 432 Hz carrier" },
-  { name: "Deep Sleep Delta", left: 100, right: 102, note: "2 Hz beat · slow-wave sleep range" },
-  { name: "Relaxed Alpha", left: 200, right: 210, note: "10 Hz beat · relaxed, calm focus" },
-  { name: "Alert Beta", left: 300, right: 320, note: "20 Hz beat · active, alert thinking" },
+   brain perceives is |left - right|. Bands use standard EEG ranges, grouped
+   the way hemi-sync-style tools frame them: a range plus what it's for. */
+const PRESET_GROUPS = [
+  {
+    band: "Delta",
+    range: "0.5 – 4 Hz",
+    purpose: "deep, dreamless sleep & physical healing",
+    items: [
+      { name: "Deep Sleep", left: 100, right: 102 },
+      { name: "Delta Healing", left: 136.1, right: 137.1 },
+    ],
+  },
+  {
+    band: "Theta",
+    range: "4 – 8 Hz",
+    purpose: "deep meditation, light sleep & vivid imagery",
+    items: [
+      { name: "Meditative Theta", left: 110, right: 103 },
+      { name: "Vivid Imagery", left: 200, right: 204 },
+    ],
+  },
+  {
+    band: "Alpha",
+    range: "8 – 13 Hz",
+    purpose: "relaxed focus & calm thinking",
+    items: [
+      { name: "Relaxed Alpha", left: 200, right: 210 },
+      { name: "Light Relaxation", left: 250, right: 258 },
+    ],
+  },
+  {
+    band: "Beta",
+    range: "13 – 30 Hz",
+    purpose: "active concentration & problem-solving",
+    items: [
+      { name: "Alert Beta", left: 300, right: 320 },
+      { name: "Deep Focus", left: 400, right: 414 },
+    ],
+  },
+  {
+    band: "Gamma",
+    range: "30 – 100 Hz",
+    purpose: "peak focus & high-level cognition",
+    items: [{ name: "Focus Gamma", left: 400, right: 432 }],
+  },
 ];
 
 const BANDS = [
@@ -395,18 +433,34 @@ el.oscLink.addEventListener("change", (e) => {
 /* ---------- Presets UI ---------- */
 function renderPresets() {
   el.presetGrid.innerHTML = "";
-  for (const p of PRESETS) {
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "preset-btn";
-    btn.dataset.left = p.left;
-    btn.dataset.right = p.right;
-    btn.innerHTML = `<span class="preset-name">${p.name}</span><span class="preset-detail">${p.left} Hz / ${p.right} Hz · ${p.note}</span>`;
-    btn.addEventListener("click", () => {
-      syncFreqLeft(p.left);
-      syncFreqRight(p.right);
-    });
-    el.presetGrid.appendChild(btn);
+  for (const group of PRESET_GROUPS) {
+    const section = document.createElement("div");
+    section.className = "preset-band-group";
+    section.dataset.band = group.band.toLowerCase();
+
+    const header = document.createElement("div");
+    header.className = "preset-band-header";
+    header.innerHTML = `<span class="preset-band-name">${group.band}</span><span class="preset-band-range">${group.range}</span><span class="preset-band-purpose">${group.purpose}</span>`;
+    section.appendChild(header);
+
+    const grid = document.createElement("div");
+    grid.className = "preset-grid";
+    for (const p of group.items) {
+      const beat = round(Math.abs(p.left - p.right), 2);
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "preset-btn";
+      btn.dataset.left = p.left;
+      btn.dataset.right = p.right;
+      btn.innerHTML = `<span class="preset-name">${p.name}</span><span class="preset-detail">${p.left} Hz / ${p.right} Hz · ${beat} Hz beat</span>`;
+      btn.addEventListener("click", () => {
+        syncFreqLeft(p.left);
+        syncFreqRight(p.right);
+      });
+      grid.appendChild(btn);
+    }
+    section.appendChild(grid);
+    el.presetGrid.appendChild(section);
   }
   highlightActivePreset();
 }
